@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\Contracts\WorkflowRepositoryInterface;
+use App\Repositories\WorkflowRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -12,7 +14,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(
+            WorkflowRepositoryInterface::class,
+            WorkflowRepository::class
+        );
     }
 
     /**
