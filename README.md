@@ -10,7 +10,7 @@ Une application web moderne pour documenter, partager et gérer vos workflows N8
 ## 🎯 Fonctionnalités
 
 ### ✨ Gestion des Workflows
-- **CRUD complet** : Créer, lire, modifier, supprimer vos workflows N8N
+- **CRUD complet** : Créer, lire, modifier, supprimer vos documentations de workflows N8N
 - **Upload JSON** : Import direct de vos fichiers workflow N8N (.json)
 - **Saisie manuelle** : Éditeur JSON intégré avec validation
 - **Formatage automatique** : JSON formatter et coloration syntaxique
@@ -24,10 +24,8 @@ Une application web moderne pour documenter, partager et gérer vos workflows N8
 ### 🔒 Gestion des Permissions
 - **Visibilité granulaire** : Privé, Équipe, Public
 - **Contrôle d'accès** : Seuls les propriétaires peuvent modifier/supprimer
-- **Authentification** : Protection par Laravel Sanctum
 
 ### 🎨 Interface Utilisateur
-- **Design moderne** : Style Notion/GitHub avec Tailwind CSS
 - **Responsive** : Optimisé mobile/tablette/desktop
 - **Cards interactives** : Vue grille avec métadonnées
 - **Recherche avancée** : Filtres par tags, auteur, titre
@@ -112,7 +110,7 @@ resources/js/
 1. **Cloner et installer les dépendances**
 ```bash
 git clone <repository-url>
-cd n8n-workflow-manager
+cd n8n-workflows-docs-v2
 composer install
 npm install
 ```
@@ -139,26 +137,6 @@ npm run dev
 5. **Serveur de développement**
 ```bash
 php artisan serve
-```
-
-### Variables d'environnement
-```env
-APP_NAME="N8N Workflow Manager"
-APP_ENV=local
-APP_DEBUG=true
-APP_URL=http://localhost
-
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=n8n_workflows
-DB_USERNAME=root
-DB_PASSWORD=
-
-# Optionnel : Configuration mail pour notifications
-MAIL_MAILER=smtp
-MAIL_HOST=mailpit
-MAIL_PORT=1025
 ```
 
 ## 📊 Base de Données
@@ -417,61 +395,6 @@ Route::middleware('auth')->group(function () {
     }
   }
 }
-```
-
-## 🚀 Déploiement
-
-### Production Laravel
-```bash
-# Optimisations production
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-php artisan optimize
-
-# Assets
-npm run build
-```
-
-### Docker (Optionnel)
-```dockerfile
-FROM php:8.2-fpm-alpine
-RUN docker-php-ext-install pdo pdo_mysql
-COPY . /var/www/html
-RUN composer install --no-dev --optimize-autoloader
-EXPOSE 9000
-```
-
-### Variables Production
-```env
-APP_ENV=production
-APP_DEBUG=false
-APP_URL=https://your-domain.com
-
-# Sécurité
-SESSION_SECURE_COOKIE=true
-SANCTUM_STATEFUL_DOMAINS=your-domain.com
-```
-
-## 🤝 Contribution
-
-### Standards Code
-- **PSR-12** pour PHP
-- **ESLint + Prettier** pour JavaScript/Vue
-- **Tests** obligatoires pour nouvelles fonctionnalités
-- **Documentation** inline et README
-
-### Workflow Git
-```bash
-# Créer une feature branch
-git checkout -b feature/nouvelle-fonctionnalite
-
-# Commit conventionnel
-git commit -m "feat: ajouter export PDF des workflows"
-
-# Tests avant push
-php artisan test
-npm run lint
 ```
 
 ## 🆘 Support
