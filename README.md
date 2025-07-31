@@ -1,61 +1,485 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🔄 N8N Workflow Manager
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Une application web moderne pour documenter, partager et gérer vos workflows N8N au sein de votre équipe.
 
-## About Laravel
+![Laravel](https://img.shields.io/badge/Laravel-12+-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![Vue.js](https://img.shields.io/badge/Vue.js-3-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white)
+![Inertia.js](https://img.shields.io/badge/Inertia.js-1.0-9553E9?style=for-the-badge&logo=inertia&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🎯 Fonctionnalités
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### ✨ Gestion des Workflows
+- **CRUD complet** : Créer, lire, modifier, supprimer vos workflows N8N
+- **Upload JSON** : Import direct de vos fichiers workflow N8N (.json)
+- **Saisie manuelle** : Éditeur JSON intégré avec validation
+- **Formatage automatique** : JSON formatter et coloration syntaxique
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 📝 Documentation
+- **Support Markdown** : Descriptions riches avec aperçu en temps réel
+- **Rendu HTML** : Conversion automatique Markdown → HTML
+- **Métadonnées** : Titre, auteur, dates de création/modification
+- **Tags système** : Catégorisation et filtrage avancé
 
-## Learning Laravel
+### 🔒 Gestion des Permissions
+- **Visibilité granulaire** : Privé, Équipe, Public
+- **Contrôle d'accès** : Seuls les propriétaires peuvent modifier/supprimer
+- **Authentification** : Protection par Laravel Sanctum
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 🎨 Interface Utilisateur
+- **Design moderne** : Style Notion/GitHub avec Tailwind CSS
+- **Responsive** : Optimisé mobile/tablette/desktop
+- **Cards interactives** : Vue grille avec métadonnées
+- **Recherche avancée** : Filtres par tags, auteur, titre
+- **Tri dynamique** : Par date, titre, dernière modification
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 🔍 Visualisation
+- **JSON Viewer** : Affichage formaté avec coloration syntaxique
+- **Résumé automatique** : Comptage nœuds, connexions, types
+- **Aperçu Markdown** : Rendu temps réel
+- **Export** : Téléchargement JSON, copie presse-papier
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🏗️ Architecture
 
-## Laravel Sponsors
+### Backend - Clean Architecture
+```
+app/
+├── Models/
+│   └── Workflow.php              # Modèle Eloquent
+├── Repositories/
+│   ├── Contracts/
+│   │   └── WorkflowRepositoryInterface.php
+│   └── WorkflowRepository.php    # Implémentation Eloquent
+├── UseCases/
+│   └── Workflow/
+│       ├── Create/
+│       │   ├── CreateWorkflowInput.php
+│       │   ├── CreateWorkflowOutput.php
+│       │   └── CreateWorkflowAction.php
+│       ├── Update/
+│       │   ├── UpdateWorkflowInput.php
+│       │   ├── UpdateWorkflowOutput.php
+│       │   └── UpdateWorkflowAction.php
+│       ├── GetList/
+│       │   ├── GetWorkflowListInput.php
+│       │   ├── GetWorkflowListOutput.php
+│       │   └── GetWorkflowListAction.php
+│       └── Delete/
+│           └── DeleteWorkflowAction.php
+├── Presenters/
+│   └── Workflow/
+│       ├── WorkflowViewModel.php
+│       ├── WorkflowListViewModel.php
+│       └── WorkflowPresenter.php
+├── Http/
+│   ├── Controllers/
+│   │   └── WorkflowController.php
+│   └── Requests/
+│       ├── StoreWorkflowRequest.php
+│       └── UpdateWorkflowRequest.php
+└── Providers/
+    └── AppServiceProvider.php    # Bindings DI
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Frontend - Vue 3 + Composition API
+```
+resources/js/
+├── Pages/
+│   └── Workflows/
+│       ├── Index.vue             # Liste des workflows
+│       ├── Create.vue            # Formulaire création
+│       ├── Show.vue              # Affichage détaillé
+│       └── Edit.vue              # Formulaire édition
+└── Components/
+    └── Workflows/
+        ├── WorkflowCard.vue      # Composant carte
+        ├── TagBadge.vue          # Badge tag
+        ├── VisibilityBadge.vue   # Badge visibilité
+        └── JsonViewer.vue        # Visualiseur JSON
+```
 
-### Premium Partners
+## 🚀 Installation
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Prérequis
+- PHP 8.2+
+- Composer
+- Node.js 18+
+- MySQL/PostgreSQL
+- Laravel 12+
 
-## Contributing
+### Configuration
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. **Cloner et installer les dépendances**
+```bash
+git clone <repository-url>
+cd n8n-workflow-manager
+composer install
+npm install
+```
 
-## Code of Conduct
+2. **Configuration environnement**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+3. **Base de données**
+```bash
+# Configurer .env avec vos paramètres DB
+php artisan migrate
+```
 
-## Security Vulnerabilities
+4. **Assets**
+```bash
+npm run build
+# ou pour le développement
+npm run dev
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+5. **Serveur de développement**
+```bash
+php artisan serve
+```
 
-## License
+### Variables d'environnement
+```env
+APP_NAME="N8N Workflow Manager"
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=n8n_workflows
+DB_USERNAME=root
+DB_PASSWORD=
+
+# Optionnel : Configuration mail pour notifications
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
+```
+
+## 📊 Base de Données
+
+### Table `workflows`
+```sql
+CREATE TABLE workflows (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NULL,
+    workflow_json JSON NOT NULL,
+    tags JSON NULL,
+    visibility ENUM('private', 'team', 'public') DEFAULT 'private',
+    user_id BIGINT NOT NULL,
+    slug VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_visibility_created (visibility, created_at),
+    INDEX idx_user_created (user_id, created_at)
+);
+```
+
+## 🎯 Utilisation
+
+### Créer un Workflow
+
+1. **Via Interface Web**
+   - Cliquer sur "Nouveau Workflow"
+   - Remplir le formulaire (titre, description Markdown)
+   - Upload fichier JSON N8N ou saisie manuelle
+   - Ajouter des tags pour la catégorisation
+   - Choisir la visibilité (Privé/Équipe/Public)
+
+2. **Validation JSON**
+   - Structure N8N obligatoire : `{"nodes": [...], "connections": {...}}`
+   - Validation automatique en temps réel
+   - Formatage JSON automatique
+
+### Recherche et Filtrage
+
+```php
+// Exemples de filtres supportés
+$filters = [
+    'search' => 'API synchronisation',  // Titre ou description
+    'tags' => ['api', 'webhook'],       // Tags multiples
+    'author' => 'John Doe'              // Nom d'auteur
+];
+
+// Tri disponible
+$sortOptions = [
+    'created_at-desc',    // Plus récents (défaut)
+    'created_at-asc',     // Plus anciens
+    'title-asc',          // Titre A-Z
+    'title-desc',         // Titre Z-A
+    'updated_at-desc'     // Dernière modification
+];
+```
+
+### Gestion des Permissions
+
+```php
+// Niveaux de visibilité
+'private' => 'Visible uniquement par le créateur'
+'team'    => 'Visible par l\'équipe (futur)'
+'public'  => 'Visible par tous les utilisateurs'
+
+// Permissions automatiques
+$workflow->canEdit   = $user->id === $workflow->user_id;
+$workflow->canDelete = $user->id === $workflow->user_id;
+```
+
+## 🧪 Tests
+
+### Tests Unitaires
+```bash
+# Lancer tous les tests
+php artisan test
+
+# Tests spécifiques
+php artisan test --filter WorkflowTest
+php artisan test tests/Feature/WorkflowControllerTest.php
+```
+
+### Structure de Test
+```php
+tests/
+├── Feature/
+│   ├── WorkflowControllerTest.php
+│   ├── WorkflowAuthorizationTest.php
+│   └── WorkflowValidationTest.php
+├── Unit/
+│   ├── Models/WorkflowTest.php
+│   ├── Repositories/WorkflowRepositoryTest.php
+│   └── UseCases/CreateWorkflowActionTest.php
+└── TestCase.php
+```
+
+## 🔧 API Routes
+
+```php
+Route::middleware('auth')->group(function () {
+    Route::get('/workflows', [WorkflowController::class, 'index'])
+         ->name('workflows.index');
+    
+    Route::get('/workflows/create', [WorkflowController::class, 'create'])
+         ->name('workflows.create');
+    
+    Route::post('/workflows', [WorkflowController::class, 'store'])
+         ->name('workflows.store');
+    
+    Route::get('/workflows/{slug}', [WorkflowController::class, 'show'])
+         ->name('workflows.show');
+    
+    Route::get('/workflows/{slug}/edit', [WorkflowController::class, 'edit'])
+         ->name('workflows.edit');
+    
+    Route::put('/workflows/{slug}', [WorkflowController::class, 'update'])
+         ->name('workflows.update');
+    
+    Route::delete('/workflows/{slug}', [WorkflowController::class, 'destroy'])
+         ->name('workflows.destroy');
+});
+```
+
+## 📱 Interface Utilisateur
+
+### Pages Principales
+
+**Dashboard (`/workflows`)**
+- Vue grille responsive des workflows
+- Filtres avancés (recherche, tags, auteur)
+- Tri dynamique
+- Pagination
+- Actions : Voir, Éditer, Supprimer (selon permissions)
+
+**Création (`/workflows/create`)**
+- Formulaire complet avec validation
+- Upload JSON ou saisie manuelle
+- Aperçu Markdown temps réel
+- Tags suggérés basés sur l'existant
+- Contrôle visibilité
+
+**Affichage (`/workflows/{slug}`)**
+- Onglets : Description, JSON, Aperçu visuel
+- Métadonnées complètes
+- Actions d'export (copie, téléchargement)
+- Résumé automatique (nœuds, connexions)
+
+**Édition (`/workflows/{slug}/edit`)**
+- Pré-remplissage des données existantes
+- Validation JSON temps réel
+- Compteurs dynamiques (nœuds/connexions)
+
+### Composants Réutilisables
+
+**WorkflowCard.vue**
+- Affichage compact avec métadonnées
+- Actions contextuelles
+- États visuels (visibilité, tags)
+- Modal de confirmation suppression
+
+**JsonViewer.vue**
+- Coloration syntaxique
+- Modes collapsed/expanded
+- Format compact/indenté
+- Copie/téléchargement
+
+**TagBadge.vue**
+- Couleurs automatiques par catégorie
+- Variantes prédéfinies
+- Actions de suppression
+
+## 🎨 Design System
+
+### Couleurs Tailwind
+```css
+/* Palette principale */
+--indigo-50: #eef2ff;
+--indigo-600: #4f46e5;
+--indigo-700: #4338ca;
+
+/* États */
+--green-100: #dcfce7;   /* Succès */
+--red-100: #fee2e2;     /* Erreur */
+--yellow-100: #fef3c7;  /* Warning */
+--gray-100: #f3f4f6;    /* Neutre */
+```
+
+### Composants UI
+- **Cards** : `shadow-sm hover:shadow-md transition-shadow`
+- **Boutons** : États hover/focus avec ring-2
+- **Formulaires** : Validation visuelle inline
+- **Modales** : Backdrop blur avec animations
+
+## 🔄 Workflow JSON Structure
+
+### Format N8N Standard
+```json
+{
+  "nodes": [
+    {
+      "id": "unique-node-id",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [250, 300],
+      "parameters": {
+        "url": "https://api.example.com/data",
+        "method": "GET"
+      }
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
+```
+
+### Exemples de Workflows
+```json
+// Exemple : Notification Slack automatique
+{
+  "nodes": [
+    {
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "path": "order-received"
+      }
+    },
+    {
+      "id": "slack-notification",
+      "name": "Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "channel": "#orders",
+        "text": "Nouvelle commande reçue: {{$json.orderId}}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [["Slack"]]
+    }
+  }
+}
+```
+
+## 🚀 Déploiement
+
+### Production Laravel
+```bash
+# Optimisations production
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan optimize
+
+# Assets
+npm run build
+```
+
+### Docker (Optionnel)
+```dockerfile
+FROM php:8.2-fpm-alpine
+RUN docker-php-ext-install pdo pdo_mysql
+COPY . /var/www/html
+RUN composer install --no-dev --optimize-autoloader
+EXPOSE 9000
+```
+
+### Variables Production
+```env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-domain.com
+
+# Sécurité
+SESSION_SECURE_COOKIE=true
+SANCTUM_STATEFUL_DOMAINS=your-domain.com
+```
+
+## 🤝 Contribution
+
+### Standards Code
+- **PSR-12** pour PHP
+- **ESLint + Prettier** pour JavaScript/Vue
+- **Tests** obligatoires pour nouvelles fonctionnalités
+- **Documentation** inline et README
+
+### Workflow Git
+```bash
+# Créer une feature branch
+git checkout -b feature/nouvelle-fonctionnalite
+
+# Commit conventionnel
+git commit -m "feat: ajouter export PDF des workflows"
+
+# Tests avant push
+php artisan test
+npm run lint
+```
+
+## 🆘 Support
+
+- **Email** : ant.debout@gmail.com
+
+---
+
+**Développé avec ❤️ pour la communauté N8N**
+
+*Cette application facilite la documentation et le partage de workflows N8N au sein des équipes, en suivant les meilleures pratiques de développement moderne.*
