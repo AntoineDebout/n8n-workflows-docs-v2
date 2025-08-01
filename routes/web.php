@@ -1,14 +1,13 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WorkflowController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return redirect()->route('login');
-});
+Route::get('/', [HomeController::class, 'index']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -36,5 +35,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/workflows/{slug}', [WorkflowController::class, 'destroy'])
          ->name('workflows.destroy');
 });
+
+Route::get('/workflows/{slug}/public', [WorkflowController::class, 'showPublic'])
+    ->name('workflows.public.show');
 
 require __DIR__.'/auth.php';

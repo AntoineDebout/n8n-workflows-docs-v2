@@ -116,6 +116,22 @@ class WorkflowController extends Controller
         ]);
     }
 
+    public function showPublic(string $slug): Response
+    {
+        $workflow = $this->workflowRepository->findBySlug($slug);
+
+        if (!$workflow || $workflow->visibility !== 'public') {
+            abort(404, 'Workflow non trouvé');
+        }
+
+        $data = $this->presenter->presentSingle($workflow, null);
+
+        return Inertia::render('Workflows/Show', [
+            'workflow' => $data,
+            'isPublicView' => true
+        ]);
+    }
+
     public function edit(string $slug): Response
     {
         $workflow = $this->workflowRepository->findBySlug($slug);
