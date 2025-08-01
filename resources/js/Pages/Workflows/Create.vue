@@ -56,9 +56,16 @@
                     :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500': errors.description }"
                     placeholder="Décrivez le workflow, son objectif, ses étapes..."
                   />
-                  <p class="mt-1 text-xs text-gray-500">
-                    Utilisez la syntaxe Markdown pour formater votre description
-                  </p>
+                  <div class="flex items-center justify-between mt-2">
+                    <button
+                      type="button"
+                      @click="showGenerateModal = true"
+                      class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-md hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                      <SparklesIcon class="w-4 h-4 mr-2" />
+                      Générer avec l'IA
+                    </button>
+                  </div>
                 </div>
                 <div class="hidden lg:block">
                   <div class="border border-gray-200 rounded-md p-4 h-full bg-gray-50">
@@ -274,6 +281,12 @@
         </div>
       </div>
     </div>
+
+    <!-- Modale de génération de description -->
+    <GenerateDescriptionModal
+      v-model:show="showGenerateModal"
+      @description-generated="form.description = $event"
+    />
   </AuthenticatedLayout>
 </template>
 
@@ -281,13 +294,15 @@
 import { ref, computed, watch } from 'vue'
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import GenerateDescriptionModal from '@/Components/Workflow/GenerateDescriptionModal.vue'
 import Swal from 'sweetalert2'
 import {
   ArrowLeftIcon,
   CloudArrowUpIcon,
   CodeBracketIcon,
   CheckIcon,
-  XMarkIcon
+  XMarkIcon,
+  SparklesIcon
 } from '@heroicons/vue/24/outline'
 
 const props = defineProps({
@@ -317,6 +332,7 @@ const jsonError = ref('')
 const newTag = ref('')
 const isDragOver = ref(false)
 const uploadedFileName = ref('')
+const showGenerateModal = ref(false)
 
 const markdownPreview = computed(() => {
   // Simple markdown to HTML conversion (you might want to use a proper library like marked.js)
