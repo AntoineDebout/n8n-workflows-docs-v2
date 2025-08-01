@@ -20,7 +20,7 @@ Une application web moderne pour documenter, partager et gérer vos workflows N8
 - **Rendu HTML** : Conversion automatique Markdown → HTML
 - **Métadonnées** : Titre, auteur, dates de création/modification
 - **Tags système** : Catégorisation et filtrage avancé
-- ** Preview N8N ** : https://n8n-io.github.io/n8n-demo-webcomponent/
+- **Preview N8N** : https://n8n-io.github.io/n8n-demo-webcomponent/
 
 ### 🔒 Gestion des Permissions
 - **Visibilité granulaire** : Privé, Équipe, Public
