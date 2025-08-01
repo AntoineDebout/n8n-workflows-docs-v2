@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateWorkflowRequest;
 use App\Models\Workflow;
 use App\Presenters\Workflow\WorkflowPresenter;
 use App\Repositories\Contracts\WorkflowRepositoryInterface;
+use Illuminate\Support\Facades\Auth;
 use App\UseCases\Workflow\Create\CreateWorkflowAction;
 use App\UseCases\Workflow\Create\CreateWorkflowInput;
 use App\UseCases\Workflow\Delete\DeleteWorkflowAction;
@@ -37,7 +38,7 @@ class WorkflowController extends Controller
         $sortDirection = $request->get('sort_direction', 'desc');
 
         $input = new GetWorkflowListInput(
-            userId: auth()->id(),
+            userId: Auth::id(),
             filters: $filters,
             sortBy: $sortBy,
             sortDirection: $sortDirection
@@ -105,14 +106,32 @@ class WorkflowController extends Controller
         }
 
         // Vérifier la visibilité
-        if ($workflow->visibility === 'private' && $workflow->user_id !== auth()->id()) {
+        if ($workflow->visibility === 'private' && (!Auth::check() || $workflow->user_id !== Auth::id())) {
             abort(403, 'Accès non autorisé');
         }
 
-        $data = $this->presenter->presentSingle($workflow, auth()->id());
+        $data = $this->presenter->presentSingle($workflow, Auth::id());
 
         return Inertia::render('Workflows/Show', [
-            'workflow' => $data
+            'workflow' => $data,
+            'canEdit' => Auth::check() && Auth::id() === $workflow->user_id,
+            'canDelete' => Auth::check() && Auth::id() === $workflow->user_id,
+        ]);
+    }
+
+    public function showPublic(string $slug): Response
+    {
+        $workflow = $this->workflowRepository->findBySlug($slug);
+
+        if (!$workflow || $workflow->visibility !== 'public') {
+            abort(404, 'Workflow non trouvé');
+        }
+
+        $data = $this->presenter->presentSingle($workflow, null);
+
+        return Inertia::render('Workflows/Show', [
+            'workflow' => $data,
+            'isPublicView' => true
         ]);
     }
 
@@ -120,7 +139,7 @@ class WorkflowController extends Controller
     {
         $workflow = $this->workflowRepository->findBySlug($slug);
 
-        if (!$workflow || $workflow->user_id !== auth()->id()) {
+        if (!$workflow || $workflow->user_id !== Auth::id()) {
             abort(404, 'Workflow non trouvé ou non autorisé');
         }
 
