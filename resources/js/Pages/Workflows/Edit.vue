@@ -221,11 +221,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import Swal from 'sweetalert2'
 import {
   ArrowLeftIcon,
+  CloudArrowUpIcon,
+  CodeBracketIcon,
   CheckIcon,
   XMarkIcon
 } from '@heroicons/vue/24/outline'
@@ -245,19 +248,26 @@ const props = defineProps({
   }
 })
 
+// S'assurer que nous avons un JSON valide et utilisons la bonne propriété
+const defaultJson = { nodes: [], connections: {} }
+const workflowJson = props.workflow?.workflow_json || props.workflow?.workflowJson || defaultJson
+
 const form = useForm({
-  title: props.workflow.title,
-  description: props.workflow.description || '',
-  workflow_json: props.workflow.workflowJson,
-  tags: [...(props.workflow.tags || [])],
-  visibility: props.workflow.visibility
+  title: props.workflow?.title || '',
+  description: props.workflow?.description || '',
+  workflow_json: workflowJson,
+  tags: props.workflow?.tags || [],
+  visibility: props.workflow?.visibility || 'private'
 })
 
 const { errors } = form
 
-const jsonInput = ref('')
+const inputMethod = ref('manual')
+const jsonInput = ref(JSON.stringify(workflowJson, null, 2))
 const jsonError = ref('')
 const newTag = ref('')
+const isDragOver = ref(false)
+const uploadedFileName = ref('')
 
 const markdownPreview = computed(() => {
   if (!form.description) return ''
@@ -299,19 +309,24 @@ const connectionCount = computed(() => {
 
 const isFormValid = computed(() => {
   return form.title && 
+         form.workflow_json && 
          Object.keys(form.workflow_json).length > 0 && 
          !jsonError.value
 })
 
 const validateJson = () => {
-  if (!jsonInput.value.trim()) {
+  if (!jsonInput.value?.trim()) {
     jsonError.value = ''
-    form.workflow_json = {}
+    form.workflow_json = defaultJson
     return
   }
 
   try {
     const parsed = JSON.parse(jsonInput.value)
+    if (!parsed || typeof parsed !== 'object') {
+      jsonError.value = 'Le JSON doit être un objet valide'
+      return
+    }
     if (!parsed.nodes || !Array.isArray(parsed.nodes)) {
       jsonError.value = 'Le JSON doit contenir un tableau "nodes"'
       return
@@ -354,14 +369,56 @@ const removeTag = (index) => {
 }
 
 const submitForm = () => {
-  validateJson()
-  if (jsonError.value) return
+  if (inputMethod.value === 'manual') {
+    validateJson()
+    if (jsonError.value) return
+  }
 
-  form.put(route('workflows.update', props.workflow.slug))
+  form.put(route('workflows.update', props.workflow.slug), {
+    onSuccess: () => {
+      Swal.fire({
+        title: 'Succès !',
+        text: 'Le workflow a été mis à jour avec succès',
+        icon: 'success',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        },
+        background: '#22c55e', // vert
+        color: '#ffffff', // texte blanc
+        iconColor: '#ffffff' // icône blanche
+      })
+    },
+    onError: (errors) => {
+      let errorMessage = Object.values(errors).join('\n')
+      Swal.fire({
+        title: 'Erreur',
+        text: errorMessage,
+        icon: 'error',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        },
+        background: '#ef4444', // rouge
+        color: '#ffffff', // texte blanc
+        iconColor: '#ffffff' // icône blanche
+      })
+    }
+  })
 }
 
-onMounted(() => {
-  jsonInput.value = JSON.stringify(props.workflow.workflowJson, null, 2)
+// Watch pour synchroniser jsonInput avec form.workflow_json
+watch(jsonInput, () => {
   validateJson()
 })
 </script>

@@ -281,6 +281,7 @@
 import { ref, computed, watch } from 'vue'
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import Swal from 'sweetalert2'
 import {
   ArrowLeftIcon,
   CloudArrowUpIcon,
@@ -430,7 +431,47 @@ const submitForm = () => {
     if (jsonError.value) return
   }
 
-  form.post(route('workflows.store'))
+  form.post(route('workflows.store'), {
+    onSuccess: () => {
+      Swal.fire({
+        title: 'Succès !',
+        text: 'Le workflow a été créé avec succès',
+        icon: 'success',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        },
+        background: '#22c55e', // vert
+        color: '#ffffff', // texte blanc
+        iconColor: '#ffffff' // icône blanche
+      })
+    },
+    onError: (errors) => {
+      let errorMessage = Object.values(errors).join('\n')
+      Swal.fire({
+        title: 'Erreur',
+        text: errorMessage,
+        icon: 'error',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        },
+        background: '#ef4444', // rouge
+        color: '#ffffff', // texte blanc
+        iconColor: '#ffffff' // icône blanche
+      })
+    }
+  })
 }
 
 // Watch for JSON input changes when in manual mode

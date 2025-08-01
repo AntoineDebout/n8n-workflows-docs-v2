@@ -25,6 +25,7 @@
         "vue": "^3.4.0"
     },
     "dependencies": {
-        "marked": "^16.1.1"
+        "marked": "^16.1.1",
+        "sweetalert2": "^11.22.2"
     }
 }
