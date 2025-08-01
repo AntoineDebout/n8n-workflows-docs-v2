@@ -14,12 +14,14 @@ class HomeController extends Controller
             ->with('user')
             ->latest()
             ->get()
-            ->map(function ($workflow) {
-                return [
-                    'id' => $workflow->id,
-                    'slug' => $workflow->slug,
-                    'title' => $workflow->title,
-                    'description' => $workflow->description,
+            ->map(function ($workflow) {            // Extraire la première section de la description (jusqu'au premier double saut de ligne)
+            $description = explode("\n\n", $workflow->description)[0];
+            
+            return [
+                'id' => $workflow->id,
+                'slug' => $workflow->slug,
+                'title' => $workflow->title,
+                'description' => $description,
                     'tags' => $workflow->tags,
                     'author' => $workflow->user->name,
                     'created_at' => $workflow->created_at->format('d/m/Y'),

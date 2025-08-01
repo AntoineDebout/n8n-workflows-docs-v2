@@ -1,19 +1,19 @@
 <template>
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 flex flex-col h-[280px]">
     <!-- Header with visibility indicator -->
-    <div class="p-6 pb-4">
+    <div class="p-6 pb-4 flex-1">
       <div class="flex items-start justify-between">
         <div class="flex-1">
-          <div class="flex items-center gap-2 mb-2">
-            <h3 class="text-lg font-semibold text-gray-900 line-clamp-2">
+          <div class="flex items-center gap-2 mb-3">
+            <h3 class="text-base font-medium text-gray-900 line-clamp-1">
               {{ workflow.title }}
             </h3>
-            <VisibilityBadge :visibility="workflow.visibility" />
+            <VisibilityBadge :visibility="workflow.visibility" class="flex-shrink-0" />
           </div>
           
-          <p v-if="workflow.descriptionExcerpt" class="text-gray-600 text-sm line-clamp-3 mb-4">
-            {{ workflow.descriptionExcerpt }}
-          </p>
+          <div v-if="workflow.descriptionExcerpt" class="text-gray-600 text-sm prose-sm mb-4 h-[60px] overflow-hidden">
+            <MarkdownContent :content="workflow.descriptionExcerpt" :truncate="true" />
+          </div>
         </div>
       </div>
 
@@ -23,23 +23,24 @@
           v-for="tag in workflow.tags.slice(0, 3)"
           :key="tag"
           :tag="tag"
+          class="flex-shrink-0"
         />
         <span
           v-if="workflow.tags.length > 3"
-          class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-600"
+          class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-600 flex-shrink-0"
         >
           +{{ workflow.tags.length - 3 }}
         </span>
       </div>
 
       <!-- Metadata -->
-      <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+      <div class="flex items-center justify-between text-sm text-gray-500">
         <div class="flex items-center gap-4">
-          <span class="flex items-center gap-1">
+          <span class="flex items-center gap-1 flex-shrink-0">
             <UserIcon class="w-4 h-4" />
             {{ workflow.authorName }}
           </span>
-          <span class="flex items-center gap-1">
+          <span class="flex items-center gap-1 flex-shrink-0">
             <ClockIcon class="w-4 h-4" />
             {{ workflow.updatedAt }}
           </span>
@@ -48,7 +49,7 @@
     </div>
 
     <!-- Actions -->
-    <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+    <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between mt-auto">
       <div class="flex items-center gap-2">
         <Link
           :href="route('workflows.show', workflow.slug)"
@@ -123,9 +124,10 @@
 <script setup>
 import { ref } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
+import TagBadge from '@/Components/TagBadge.vue'
+import VisibilityBadge from '@/Components/VisibilityBadge.vue'
+import MarkdownContent from '@/Components/MarkdownContent.vue'
 import Modal from '@/Components/Modal.vue'
-import TagBadge from '@/Components/Workflows/TagBadge.vue'
-import VisibilityBadge from '@/Components/Workflows/VisibilityBadge.vue'
 import {
   EyeIcon,
   PencilIcon,

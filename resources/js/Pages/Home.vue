@@ -2,6 +2,7 @@
 import { Head } from '@inertiajs/vue3';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import MarkdownContent from '@/Components/MarkdownContent.vue';
 import { Link } from '@inertiajs/vue3';
 
 defineProps({
@@ -47,32 +48,41 @@ defineProps({
             <div 
                 v-for="workflow in workflows" 
                 :key="workflow.id"
-                class="bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-purple-100/50 hover:shadow-xl transition-all duration-200"
+                class="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg border border-purple-100/50 hover:shadow-xl transition-all duration-200 flex flex-col h-[280px]"
             >
-                <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ workflow.title }}</h3>
-                <p class="text-gray-600 mb-4">{{ workflow.description }}</p>
-                <div class="flex flex-wrap gap-2">
-                    <span 
-                        v-for="tag in workflow.tags" 
-                        :key="tag"
-                        class="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded-full"
-                    >
-                        {{ tag }}
-                    </span>
-                </div>
-                <div class="mt-4 flex items-center justify-between">
-                    <div class="text-sm text-gray-500">
-                        Par {{ workflow.author }} · {{ workflow.created_at }}
+                <!-- Card Content -->
+                <div class="p-6 flex-1 overflow-hidden">
+                    <h3 class="text-base font-medium text-gray-800 mb-2 line-clamp-1">{{ workflow.title }}</h3>
+                    <div class="text-gray-600 mb-4 h-[60px] overflow-hidden">
+                        <MarkdownContent :content="workflow.description" :truncate="true" />
                     </div>
-                    <Link
-                        :href="route('workflows.public.show', workflow.slug)"
-                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all duration-200"
-                    >
-                        <span>Voir</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </Link>
+                    <div class="flex flex-wrap gap-2">
+                        <span 
+                            v-for="tag in workflow.tags" 
+                            :key="tag"
+                            class="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded-full flex-shrink-0"
+                        >
+                            {{ tag }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Fixed Footer -->
+                <div class="p-6 pt-3 border-t border-gray-100 mt-auto bg-gray-50/50">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-gray-500 flex-shrink-0">
+                            Par {{ workflow.author }} · {{ workflow.created_at }}
+                        </div>
+                        <Link
+                            :href="route('workflows.public.show', workflow.slug)"
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all duration-200 flex-shrink-0"
+                        >
+                            <span>Voir</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

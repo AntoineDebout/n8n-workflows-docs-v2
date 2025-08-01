@@ -188,10 +188,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, watchEffect } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import WorkflowCard from '@/Components/Workflows/WorkflowCard.vue'
+import MarkdownContent from '@/Components/MarkdownContent.vue'
 import {
   PlusIcon,
   MagnifyingGlassIcon,
