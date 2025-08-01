@@ -157,12 +157,8 @@
             </div>
 
             <!-- Preview Tab -->
-            <div v-if="activeTab === 'preview'">
-              <div class="text-center py-12 text-gray-500">
-                <CubeIcon class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <p>Aperçu visuel du workflow</p>
-                <p class="text-sm mt-2">Fonctionnalité à venir - Visualisation des nœuds N8N</p>
-              </div>
+            <div v-if="activeTab === 'preview'" class="relative">
+                <n8n-demo :workflow="JSON.stringify(workflow.workflowJson, null, 2)" />
             </div>
           </div>
         </div>
@@ -262,7 +258,7 @@ import {
   ClipboardIcon,
   CheckIcon
 } from '@heroicons/vue/24/outline'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
 
 const props = defineProps({
