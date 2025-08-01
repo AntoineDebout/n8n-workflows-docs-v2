@@ -240,7 +240,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3'
+import Swal from 'sweetalert2'
 import ArrowLeftIcon from '@/Components/icons/ArrowLeftIcon.vue';
 import UserIcon from '@/Components/icons/UserIcon.vue';
 import ClockIcon from '@/Components/icons/ClockIcon.vue';
@@ -258,8 +259,7 @@ import {
   ClipboardIcon,
   CheckIcon
 } from '@heroicons/vue/24/outline'
-import { ref, computed, onMounted } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
 
 const props = defineProps({
   workflow: {
@@ -316,7 +316,20 @@ const workflowSummary = computed(() => {
 })
 
 const confirmDelete = () => {
-  showDeleteModal.value = true
+  Swal.fire({
+    title: 'Êtes-vous sûr ?',
+    text: "Cette action est irréversible !",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Oui, supprimer',
+    cancelButtonText: 'Annuler',
+    confirmButtonColor: '#ef4444',
+    cancelButtonColor: '#6b7280',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      deleteWorkflow()
+    }
+  })
 }
 
 const deleteWorkflow = () => {
@@ -324,9 +337,43 @@ const deleteWorkflow = () => {
   
   router.delete(route('workflows.destroy', props.workflow.slug), {
     onSuccess: () => {
+      Swal.fire({
+        title: 'Supprimé !',
+        text: 'Le workflow a été supprimé avec succès',
+        icon: 'success',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        },
+        background: '#22c55e',
+        color: '#ffffff',
+        iconColor: '#ffffff'
+      })
       router.visit(route('workflows.index'))
     },
     onError: () => {
+      Swal.fire({
+        title: 'Erreur',
+        text: 'Une erreur est survenue lors de la suppression',
+        icon: 'error',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        },
+        background: '#ef4444',
+        color: '#ffffff',
+        iconColor: '#ffffff'
+      })
       isDeleting.value = false
     },
     onFinish: () => {
