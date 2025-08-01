@@ -9,11 +9,15 @@ use App\UseCases\Workflow\Create\CreateWorkflowOutput;
 use App\Repositories\Contracts\WorkflowRepositoryInterface;
 use App\Models\Workflow;
 use Mockery;
+use Mockery\MockInterface;
 
 
 class CreateWorkflowActionTest extends TestCase
 {
-    private WorkflowRepositoryInterface $repository;
+    use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+
+    /** @var WorkflowRepositoryInterface&\Mockery\MockInterface */
+    private $repository;
     private CreateWorkflowAction $action;
 
     protected function setUp(): void
