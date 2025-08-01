@@ -3,7 +3,7 @@
     <Head title="Créer un workflow" />
 
     <div class="py-12">
-      <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+      <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="mb-8">
           <div class="flex items-center gap-4 mb-4">
@@ -51,7 +51,7 @@
                   <textarea
                     id="description"
                     v-model="form.description"
-                    rows="12"
+                    rows="24"
                     class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500': errors.description }"
                     placeholder="Décrivez le workflow, son objectif, ses étapes..."
@@ -70,14 +70,16 @@
                 <div class="hidden lg:block">
                   <div class="border border-gray-200 rounded-md p-4 h-full bg-gray-50">
                     <h4 class="text-sm font-medium text-gray-700 mb-2">Aperçu</h4>
-                    <div 
-                      v-if="form.description"
-                      class="prose prose-sm max-w-none text-gray-700"
-                      v-html="markdownPreview"
-                    />
-                    <p v-else class="text-sm text-gray-500 italic">
-                      L'aperçu apparaîtra ici...
-                    </p>
+                    <div class="h-[480px] overflow-y-auto">
+                      <div 
+                        v-if="form.description"
+                        class="prose prose-sm max-w-none text-gray-700"
+                        v-html="markdownPreview"
+                      />
+                      <p v-else class="text-sm text-gray-500 italic">
+                        L'aperçu apparaîtra ici...
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
