@@ -60,8 +60,19 @@ defineProps({
                         {{ tag }}
                     </span>
                 </div>
-                <div class="mt-4 text-sm text-gray-500">
-                    Par {{ workflow.author }} · {{ workflow.created_at }}
+                <div class="mt-4 flex items-center justify-between">
+                    <div class="text-sm text-gray-500">
+                        Par {{ workflow.author }} · {{ workflow.created_at }}
+                    </div>
+                    <Link
+                        :href="route('workflows.public.show', workflow.slug)"
+                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all duration-200"
+                    >
+                        <span>Voir</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </Link>
                 </div>
             </div>
         </div>

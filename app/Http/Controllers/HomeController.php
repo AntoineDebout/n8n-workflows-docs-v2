@@ -17,6 +17,7 @@ class HomeController extends Controller
             ->map(function ($workflow) {
                 return [
                     'id' => $workflow->id,
+                    'slug' => $workflow->slug,
                     'title' => $workflow->title,
                     'description' => $workflow->description,
                     'tags' => $workflow->tags,

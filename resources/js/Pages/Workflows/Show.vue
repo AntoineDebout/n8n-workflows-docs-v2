@@ -1,5 +1,5 @@
 <template>
-  <AuthenticatedLayout>
+  <component :is="$page.props.auth.user ? AuthenticatedLayout : GuestLayout">
     <Head :title="workflow.title" />
 
     <div class="py-12">
@@ -8,7 +8,7 @@
         <div class="mb-8">
           <div class="flex items-center gap-4 mb-4">
             <Link
-              :href="route('workflows.index')"
+              :href="$page.props.auth.user ? route('workflows.index') : '/'"
               class="flex items-center text-gray-500 hover:text-gray-700"
             >
               <ArrowLeftIcon class="w-4 h-4 mr-1" />
@@ -49,9 +49,9 @@
             </div>
 
             <!-- Actions -->
-            <div v-if="workflow.canEdit || workflow.canDelete" class="flex items-center gap-2 ml-6">
+            <div v-if="canEdit || canDelete" class="flex items-center gap-2 ml-6">
               <Link
-                v-if="workflow.canEdit"
+                v-if="canEdit"
                 :href="route('workflows.edit', workflow.slug)"
                 class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
               >
@@ -60,7 +60,7 @@
               </Link>
               
               <button
-                v-if="workflow.canDelete"
+                v-if="canDelete"
                 type="button"
                 class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150"
                 @click="confirmDelete"
@@ -238,38 +238,45 @@
         </Modal>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </component>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { Head, Link, router } from '@inertiajs/vue3'
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import GuestLayout from '@/Layouts/GuestLayout.vue';
+import { Head, Link } from '@inertiajs/vue3';
+import ArrowLeftIcon from '@/Components/icons/ArrowLeftIcon.vue';
+import UserIcon from '@/Components/icons/UserIcon.vue';
+import ClockIcon from '@/Components/icons/ClockIcon.vue';
+import PencilIcon from '@/Components/icons/PencilIcon.vue';
+import TagBadge from '@/Components/TagBadge.vue';
+import VisibilityBadge from '@/Components/VisibilityBadge.vue';
+import DangerButton from '@/Components/DangerButton.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
 import Modal from '@/Components/Modal.vue'
-import TagBadge from '@/Components/Workflows/TagBadge.vue'
-import VisibilityBadge from '@/Components/Workflows/VisibilityBadge.vue'
 import JsonViewer from '@/Components/Workflows/JsonViewer.vue'
 import {
-  ArrowLeftIcon,
-  UserIcon,
-  ClockIcon,
-  PencilIcon,
-  TrashIcon,
-  DocumentTextIcon,
-  CodeBracketIcon,
-  EyeIcon,
-  DocumentIcon,
-  ClipboardIcon,
-  CheckIcon,
   ArrowDownTrayIcon,
   CubeIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  ClipboardIcon,
+  CheckIcon
 } from '@heroicons/vue/24/outline'
+import { ref, computed } from 'vue'
+import { router } from '@inertiajs/vue3'
 
 const props = defineProps({
   workflow: {
     type: Object,
     required: true
+  },
+  canEdit: {
+    type: Boolean,
+    default: false
+  },
+  canDelete: {
+    type: Boolean,
+    default: false
   }
 })
 
