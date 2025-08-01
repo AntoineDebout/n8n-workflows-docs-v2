@@ -27,7 +27,7 @@ class PasswordConfirmationTest extends TestCase
             'password' => 'password',
         ]);
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('workflows.index', absolute: false));
         $response->assertSessionHasNoErrors();
     }
 
