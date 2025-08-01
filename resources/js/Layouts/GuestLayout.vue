@@ -5,7 +5,7 @@ import { Link } from '@inertiajs/vue3';
 
 <template>
     <div
-        class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-6"
+        class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-6 pb-12"
     >
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center">
