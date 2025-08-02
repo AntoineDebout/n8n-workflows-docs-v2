@@ -1,11 +1,11 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WorkflowController;
-use Illuminate\Foundation\Application;
+use App\Http\Middleware\EnsureUserRoleIsAdmin;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index']);
 
@@ -35,7 +35,16 @@ Route::middleware('auth')->group(function () {
     
     Route::delete('/workflows/{slug}', [WorkflowController::class, 'destroy'])
          ->name('workflows.destroy');
+
+     Route::middleware(['admin'])->group(function () {
+        Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+        Route::patch('/admin/users/{user}/team', [AdminController::class, 'updateUserTeam'])->name('admin.users.team');
+        Route::patch('/admin/users/{user}/role', [AdminController::class, 'updateUserRole'])->name('admin.users.role');
+    });
+   
 });
+
+
 
 Route::get('/workflows/{slug}/public', [WorkflowController::class, 'showPublic'])
     ->name('workflows.public.show');
