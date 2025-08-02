@@ -12,37 +12,75 @@
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
-                        <!-- Filters and Actions -->
-                        <div class="mb-4 flex justify-between items-center">
-                            <div class="flex-1 pr-4">
-                                <div class="relative">
-                                    <input
-                                        v-model="search"
-                                        type="search"
-                                        placeholder="Rechercher..."
-                                        class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
-                                    >
-                                    <div class="absolute left-3 top-3">
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                        </svg>
-                                    </div>
+                        <!-- Actions -->
+                        <div class="flex flex-col sm:flex-row justify-end gap-2 mb-6">
+                            <button
+                                @click="showCreateModal = true"
+                                class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 h-10 whitespace-nowrap"
+                            >
+                                Ajouter un utilisateur
+                            </button>
+                            <button
+                                v-if="hasAnyChanges()"
+                                @click="saveAllChanges"
+                                class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 h-10 whitespace-nowrap"
+                            >
+                                Enregistrer les modifications
+                            </button>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="mb-4 space-y-4">
+                            <div class="relative">
+                                <input
+                                    v-model="filters.search"
+                                    type="search"
+                                    placeholder="Rechercher..."
+                                    class="w-full pl-10 pr-4 py-2 h-10 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                                >
+                                <div class="absolute left-3 top-3">
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
                                 </div>
                             </div>
-                            <div class="flex items-center space-x-4">
-                                <button
-                                    @click="showCreateModal = true"
-                                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                >
-                                    Ajouter un utilisateur
-                                </button>
-                                <button
-                                    v-if="hasAnyChanges()"
-                                    @click="saveAllChanges"
-                                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                >
-                                    Enregistrer les modifications
-                                </button>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                                <div class="sm:col-span-5">
+                                    <select
+                                        v-model="filters.team"
+                                        class="block w-full h-10 rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    >
+                                        <option value="">Toutes les équipes</option>
+                                        <option v-for="team in teams" :key="team.id" :value="team.id">
+                                            {{ team.name }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="sm:col-span-5">
+                                    <select
+                                        v-model="filters.role"
+                                        class="block w-full h-10 rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    >
+                                        <option value="">Tous les rôles</option>
+                                        <option v-for="role in roles" :key="role.id" :value="role.id">
+                                            {{ role.name }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="sm:col-span-2">
+                                    <button
+                                        @click="resetFilters"
+                                        class="w-full inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 h-10"
+                                        title="Réinitialiser les filtres"
+                                    >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -59,8 +97,8 @@
                                             @click="sort(column.key)"
                                         >
                                             {{ column.label }}
-                                            <span v-if="sortColumn === column.key">
-                                                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                                            <span v-if="filters.sort === column.key">
+                                                {{ filters.direction === 'asc' ? '↑' : '↓' }}
                                             </span>
                                         </th>
                                     </tr>
@@ -283,9 +321,15 @@ const columns = [
     { key: 'role', label: 'Rôle' }
 ];
 
-const search = ref(props.filters.search);
-const sortColumn = ref(props.filters.sort || 'name');
-const sortDirection = ref(props.filters.direction || 'asc');
+let unwatchFilters;
+
+const filters = ref({
+    search: props.filters.search || '',
+    team: props.filters.team || '',
+    role: props.filters.role || '',
+    sort: props.filters.sort || 'name',
+    direction: props.filters.direction || 'asc'
+});
 
 // Check if there are changes to save and the user exists in userChanges
 function hasTeamChanges(user) {
@@ -315,26 +359,22 @@ function ensureUserChanges(user) {
     return userChanges.value[user.id];
 }
 
-watch(search, debounce((value) => {
-    router.get('/admin', { search: value, sort: sortColumn.value, direction: sortDirection.value }, {
+unwatchFilters = watch(filters, debounce((value) => {
+    router.get('/admin', value, {
         preserveState: true,
         preserveScroll: true,
     });
-}, 300));
+}, 300), { deep: true });
 
 function sort(column) {
-    if (sortColumn.value === column) {
-        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+    if (filters.value.sort === column) {
+        filters.value.direction = filters.value.direction === 'asc' ? 'desc' : 'asc';
     } else {
-        sortColumn.value = column;
-        sortDirection.value = 'asc';
+        filters.value.sort = column;
+        filters.value.direction = 'asc';
     }
 
-    router.get('/admin', {
-        search: search.value,
-        sort: sortColumn.value,
-        direction: sortDirection.value
-    }, {
+    router.get('/admin', filters.value, {
         preserveState: true,
         preserveScroll: true,
     });
@@ -422,5 +462,31 @@ function createUser() {
             closeCreateModal();
         },
     });
+}
+
+// Reset filters to initial values
+function resetFilters() {
+    // Désactiver temporairement le watcher pour éviter la navigation automatique
+    unwatchFilters?.();
+    
+    filters.value.search = '';
+    filters.value.team = '';
+    filters.value.role = '';
+    filters.value.sort = 'name';
+    filters.value.direction = 'asc';
+
+    // Navigation directe vers l'URL propre
+    router.get('/admin', {}, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+
+    // Réactiver le watcher après la navigation
+    unwatchFilters = watch(filters, debounce((value) => {
+        router.get('/admin', value, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    }, 300), { deep: true });
 }
 </script>

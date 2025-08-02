@@ -15,16 +15,25 @@ class AdminController extends Controller
     {
         return Inertia::render('Admin/Index', [
             'users' => User::with(['team', 'role'])
-                ->when($request->search, function ($query, $search) {
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
+                ->when($request->filled('search'), function ($query) use ($request) {
+                    $search = $request->search;
+                    $query->where(function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%")
+                          ->orWhere('email', 'like', "%{$search}%");
+                    });
+                })
+                ->when($request->filled('team'), function ($query) use ($request) {
+                    $query->where('team_id', $request->team);
+                })
+                ->when($request->filled('role'), function ($query) use ($request) {
+                    $query->where('user_role_id', $request->role);
                 })
                 ->orderBy($request->sort ?? 'name', $request->direction ?? 'asc')
                 ->paginate(10)
                 ->withQueryString(),
             'teams' => Team::all(),
             'roles' => UserRole::all(),
-            'filters' => $request->only(['search', 'sort', 'direction']),
+            'filters' => $request->only(['search', 'team', 'role', 'sort', 'direction']),
         ]);
     }
 
