@@ -12,8 +12,8 @@
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
-                        <!-- Filters -->
-                        <div class="mb-4 flex justify-between">
+                        <!-- Filters and Actions -->
+                        <div class="mb-4 flex justify-between items-center">
                             <div class="flex-1 pr-4">
                                 <div class="relative">
                                     <input
@@ -28,6 +28,14 @@
                                         </svg>
                                     </div>
                                 </div>
+                            </div>
+                            <div v-if="hasAnyChanges()">
+                                <button
+                                    @click="saveAllChanges"
+                                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                >
+                                    Enregistrer les modifications
+                                </button>
                             </div>
                         </div>
 
@@ -58,9 +66,8 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <select
-                                                v-model="user.team_id"
+                                                v-model="ensureUserChanges(user).team_id"
                                                 class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                                                @change="updateUserTeam(user)"
                                             >
                                                 <option :value="null">Aucune équipe</option>
                                                 <option v-for="team in teams" :key="team.id" :value="team.id">
@@ -70,9 +77,8 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <select
-                                                v-model="user.user_role_id"
+                                                v-model="ensureUserChanges(user).user_role_id"
                                                 class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                                                @change="updateUserRole(user)"
                                             >
                                                 <option v-for="role in roles" :key="role.id" :value="role.id">
                                                     {{ role.name }}
@@ -96,7 +102,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import debounce from 'lodash/debounce';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
@@ -109,6 +115,29 @@ const props = defineProps({
     filters: Object
 });
 
+// Store temporary changes
+const userChanges = ref(
+    props.users.data.reduce((acc, user) => {
+        acc[user.id] = {
+            team_id: user.team_id,
+            user_role_id: user.user_role_id
+        };
+        return acc;
+    }, {})
+);
+
+// Watch for new users data and update userChanges
+watch(() => props.users.data, (newUsers) => {
+    newUsers.forEach(user => {
+        if (!userChanges.value[user.id]) {
+            userChanges.value[user.id] = {
+                team_id: user.team_id,
+                user_role_id: user.user_role_id
+            };
+        }
+    });
+}, { deep: true });
+
 const columns = [
     { key: 'name', label: 'Utilisateur' },
     { key: 'team', label: 'Équipe' },
@@ -118,6 +147,34 @@ const columns = [
 const search = ref(props.filters.search);
 const sortColumn = ref(props.filters.sort || 'name');
 const sortDirection = ref(props.filters.direction || 'asc');
+
+// Check if there are changes to save and the user exists in userChanges
+function hasTeamChanges(user) {
+    return userChanges.value[user.id] && userChanges.value[user.id].team_id !== user.team_id;
+}
+
+function hasRoleChanges(user) {
+    return userChanges.value[user.id] && userChanges.value[user.id].user_role_id !== user.user_role_id;
+}
+
+// Check if any user has pending changes
+function hasAnyChanges() {
+    return props.users.data.some(user => 
+        (userChanges.value[user.id]?.team_id !== user.team_id) ||
+        (userChanges.value[user.id]?.user_role_id !== user.user_role_id)
+    );
+}
+
+// Initialize user if not exists
+function ensureUserChanges(user) {
+    if (!userChanges.value[user.id]) {
+        userChanges.value[user.id] = {
+            team_id: user.team_id,
+            user_role_id: user.user_role_id
+        };
+    }
+    return userChanges.value[user.id];
+}
 
 watch(search, debounce((value) => {
     router.get('/admin', { search: value, sort: sortColumn.value, direction: sortDirection.value }, {
@@ -146,17 +203,57 @@ function sort(column) {
 
 function updateUserTeam(user) {
     router.patch(route('admin.users.team', user.id), {
-        team_id: user.team_id
+        team_id: userChanges.value[user.id].team_id
     }, {
-        preserveScroll: true
+        preserveScroll: true,
+        onSuccess: () => {
+            // Update the original user data after successful save
+            user.team_id = userChanges.value[user.id].team_id;
+        }
     });
 }
 
 function updateUserRole(user) {
     router.patch(route('admin.users.role', user.id), {
-        user_role_id: user.user_role_id
+        user_role_id: userChanges.value[user.id].user_role_id
     }, {
-        preserveScroll: true
+        preserveScroll: true,
+        onSuccess: () => {
+            // Update the original user data after successful save
+            user.user_role_id = userChanges.value[user.id].user_role_id;
+        }
     });
+}
+
+// Save all pending changes
+async function saveAllChanges() {
+    const changedUsers = props.users.data.filter(user => 
+        (userChanges.value[user.id]?.team_id !== user.team_id) ||
+        (userChanges.value[user.id]?.user_role_id !== user.user_role_id)
+    );
+
+    for (const user of changedUsers) {
+        if (userChanges.value[user.id]?.team_id !== user.team_id) {
+            await router.patch(route('admin.users.team', user.id), {
+                team_id: userChanges.value[user.id].team_id
+            }, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    user.team_id = userChanges.value[user.id].team_id;
+                }
+            });
+        }
+        
+        if (userChanges.value[user.id]?.user_role_id !== user.user_role_id) {
+            await router.patch(route('admin.users.role', user.id), {
+                user_role_id: userChanges.value[user.id].user_role_id
+            }, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    user.user_role_id = userChanges.value[user.id].user_role_id;
+                }
+            });
+        }
+    }
 }
 </script>
