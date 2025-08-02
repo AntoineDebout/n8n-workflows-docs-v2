@@ -41,9 +41,15 @@ class WorkflowRepository implements WorkflowRepositoryInterface
         string $sortBy = 'created_at', 
         string $sortDirection = 'desc'
     ): LengthAwarePaginator {
-        $query = Workflow::with('user')
-            ->visible($user)
-            ->withFilters($filters)
+        $query = Workflow::with('user');
+        
+        if ($user) {
+            $query->visibleTo($user);
+        } else {
+            $query->where('visibility', 'public');
+        }
+
+        $query->withFilters($filters)
             ->orderBy($sortBy, $sortDirection);
 
         return $query->paginate(12);
