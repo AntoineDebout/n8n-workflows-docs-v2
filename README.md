@@ -18,7 +18,7 @@ Une application web moderne pour documenter, partager et gérer vos workflows N8
 
 <img width="1428" height="866" alt="Capture d’écran 2025-08-02 à 13 48 05" src="https://github.com/user-attachments/assets/acded215-9212-47fb-907c-5c98d4636b43" />
 
-**Profile Pannel**
+**Profile Panel**
 <img width="1428" height="868" alt="Capture d’écran 2025-08-02 à 13 48 31" src="https://github.com/user-attachments/assets/1cba9d30-50d5-4649-9fe4-7dd804a324a2" />
 
 **Création d'une documentation de Workflow (génération de description possible par l'IA)
