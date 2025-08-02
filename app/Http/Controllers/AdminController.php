@@ -49,4 +49,25 @@ class AdminController extends Controller
 
         return back();
     }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8'],
+            'team_id' => ['nullable', 'exists:teams,id'],
+            'user_role_id' => ['required', 'exists:user_roles,id'],
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+            'team_id' => $validated['team_id'],
+            'user_role_id' => $validated['user_role_id'],
+        ]);
+
+        return back();
+    }
 }
