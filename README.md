@@ -7,6 +7,25 @@ Une application web moderne pour documenter, partager et gérer vos workflows N8
 ![Inertia.js](https://img.shields.io/badge/Inertia.js-1.0-9553E9?style=for-the-badge&logo=inertia&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
+## 💻 Ecrans
+**Page d'accueil**
+<img width="1431" height="868" alt="Capture d’écran 2025-08-02 à 13 46 56" src="https://github.com/user-attachments/assets/8a31806d-927e-4d5b-8569-3c36c70dbade" />
+
+**Vue d'un Workflow**
+<img width="1432" height="867" alt="Capture d’écran 2025-08-02 à 13 47 12" src="https://github.com/user-attachments/assets/4ddea13d-02b1-4f8b-a29e-bcd8279aa72c" />
+
+<img width="1430" height="867" alt="Capture d’écran 2025-08-02 à 13 47 34" src="https://github.com/user-attachments/assets/7b07de3c-f728-4e3d-a259-02bf4286453d" />
+
+<img width="1428" height="866" alt="Capture d’écran 2025-08-02 à 13 48 05" src="https://github.com/user-attachments/assets/acded215-9212-47fb-907c-5c98d4636b43" />
+
+**Profile Panel**
+<img width="1428" height="868" alt="Capture d’écran 2025-08-02 à 13 48 31" src="https://github.com/user-attachments/assets/1cba9d30-50d5-4649-9fe4-7dd804a324a2" />
+
+**Création d'une documentation de Workflow (génération de description possible par l'IA)**
+<img width="1426" height="867" alt="Capture d’écran 2025-08-02 à 13 48 49" src="https://github.com/user-attachments/assets/eaf47379-bb6e-4ea1-9ac5-271721918422" />
+
+<img width="1428" height="865" alt="Capture d’écran 2025-08-02 à 13 49 06" src="https://github.com/user-attachments/assets/ed6f1303-a677-4684-afdc-1303c0d73934" />
+
 ## 🎯 Fonctionnalités
 
 ### ✨ Gestion des Workflows
