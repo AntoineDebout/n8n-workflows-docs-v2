@@ -39,6 +39,13 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Workflows
                                 </NavLink>
+                                <NavLink
+                                    v-if="$page.props.auth.user.role.slug === 'admin'"
+                                    :href="route('admin.index')"
+                                    :active="route().current('admin.index')"
+                                >
+                                    Administration
+                                </NavLink>
                             </div>
                         </div>
 
