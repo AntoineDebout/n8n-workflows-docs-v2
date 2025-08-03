@@ -70,6 +70,23 @@ class Workflow extends Model
         });
     }
 
+    public function scopeVisibleTo($query, User $user)
+    {
+        return $query->where(function ($query) use ($user) {
+            $query->where('visibility', 'public')
+                ->orWhere(function ($query) use ($user) {
+                    $query->where('visibility', 'private')
+                        ->where('user_id', $user->id);
+                })
+                ->orWhere(function ($query) use ($user) {
+                    $query->where('visibility', 'team')
+                        ->whereHas('user', function ($query) use ($user) {
+                            $query->where('team_id', $user->team_id);
+                        });
+                });
+        });
+    }
+
     public function scopeWithFilters($query, array $filters = [])
     {
         if (!empty($filters['search'])) {

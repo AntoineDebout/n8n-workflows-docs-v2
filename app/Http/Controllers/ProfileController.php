@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\ProfileTeamUpdateRequest;
+use App\Models\Team;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,6 +23,8 @@ class ProfileController extends Controller
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
+            'teams' => Team::all(),
+            'currentTeam' => $request->user()->team,
         ]);
     }
 
@@ -29,13 +33,30 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $validated = $request->validated();
+        
+        if (isset($validated['name']) && isset($validated['email'])) {
+            $request->user()->fill([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+            ]);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+            if ($request->user()->isDirty('email')) {
+                $request->user()->email_verified_at = null;
+            }
         }
 
         $request->user()->save();
+
+        return Redirect::route('profile.edit');
+    }
+
+    /**
+     * Update the user's team.
+     */
+    public function updateTeam(ProfileTeamUpdateRequest $request): RedirectResponse
+    {
+        $request->user()->update($request->validated());
 
         return Redirect::route('profile.edit');
     }

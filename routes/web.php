@@ -1,17 +1,18 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WorkflowController;
-use Illuminate\Foundation\Application;
+use App\Http\Middleware\EnsureUserRoleIsAdmin;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/team', [ProfileController::class, 'updateTeam'])->name('profile.team.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/workflows', [WorkflowController::class, 'index'])
@@ -34,7 +35,17 @@ Route::middleware('auth')->group(function () {
     
     Route::delete('/workflows/{slug}', [WorkflowController::class, 'destroy'])
          ->name('workflows.destroy');
+
+     Route::middleware(['admin'])->group(function () {
+        Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+        Route::post('/admin/users', [AdminController::class, 'store'])->name('admin.users.store');
+        Route::patch('/admin/users/{user}/team', [AdminController::class, 'updateUserTeam'])->name('admin.users.team');
+        Route::patch('/admin/users/{user}/role', [AdminController::class, 'updateUserRole'])->name('admin.users.role');
+    });
+   
 });
+
+
 
 Route::get('/workflows/{slug}/public', [WorkflowController::class, 'showPublic'])
     ->name('workflows.public.show');
