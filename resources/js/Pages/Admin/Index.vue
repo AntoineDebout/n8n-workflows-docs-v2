@@ -278,12 +278,15 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, inject } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import debounce from 'lodash/debounce';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Pagination from '@/Components/Pagination.vue';
 import Modal from '@/Components/Modal.vue';
+
+// Inject Sweetalert2
+const toast = inject('toast');
 
 const props = defineProps({
     users: Object,
@@ -412,25 +415,41 @@ async function saveAllChanges() {
     );
 
     for (const user of changedUsers) {
-        if (userChanges.value[user.id]?.team_id !== user.team_id) {
-            await router.patch(route('admin.users.team', user.id), {
-                team_id: userChanges.value[user.id].team_id
-            }, {
-                preserveScroll: true,
-                onSuccess: () => {
-                    user.team_id = userChanges.value[user.id].team_id;
-                }
-            });
-        }
-        
-        if (userChanges.value[user.id]?.user_role_id !== user.user_role_id) {
-            await router.patch(route('admin.users.role', user.id), {
-                user_role_id: userChanges.value[user.id].user_role_id
-            }, {
-                preserveScroll: true,
-                onSuccess: () => {
-                    user.user_role_id = userChanges.value[user.id].user_role_id;
-                }
+        try {
+            if (userChanges.value[user.id]?.team_id !== user.team_id) {
+                await router.patch(route('admin.users.team', user.id), {
+                    team_id: userChanges.value[user.id].team_id
+                }, {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        user.team_id = userChanges.value[user.id].team_id;
+                        toast?.fire({
+                            icon: 'success',
+                            title: `Équipe modifiée pour ${user.name}`
+                        });
+                    }
+                });
+            }
+            
+            if (userChanges.value[user.id]?.user_role_id !== user.user_role_id) {
+                await router.patch(route('admin.users.role', user.id), {
+                    user_role_id: userChanges.value[user.id].user_role_id
+                }, {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        user.user_role_id = userChanges.value[user.id].user_role_id;
+                        toast?.fire({
+                            icon: 'success',
+                            title: `Rôle modifié pour ${user.name}`
+                        });
+                    }
+                });
+            }
+        } catch (error) {
+            toast?.fire({
+                icon: 'error',
+                title: 'Une erreur est survenue',
+                text: error.message || 'Impossible de mettre à jour l\'utilisateur'
             });
         }
     }
@@ -460,7 +479,18 @@ function createUser() {
     router.post(route('admin.users.store'), form.value, {
         onSuccess: () => {
             closeCreateModal();
+            toast?.fire({
+                icon: 'success',
+                title: 'Utilisateur créé avec succès'
+            });
         },
+        onError: (errors) => {
+            toast?.fire({
+                icon: 'error',
+                title: 'Erreur lors de la création',
+                text: Object.values(errors).flat().join('\n')
+            });
+        }
     });
 }
 
